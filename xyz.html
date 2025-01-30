@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Blog</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .blog-card { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-primary bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Blog Club</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+    
+    <div class="container mt-4">
+        <h1 class="text-center">New Blog!</h1>
+        
+        <div class="mb-5 bg-info p-5">
+            <input type="text" id="blogTitle" class="form-control" placeholder="Blog Title">
+            <textarea id="blogContent" class="form-control mt-2" placeholder="Write your blog here..." rows="10"></textarea>
+            <button class="btn btn-primary mt-2" onclick="addBlog()">Add Blog</button>
+        </div>
+
+        <div id="blogList" class="mt-4"></div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", loadBlogs);
+        
+        function addBlog() {
+            let title = document.getElementById("blogTitle").value;
+            let content = document.getElementById("blogContent").value;
+            if (!title || !content) { alert("Please enter both title and content!"); return; }
+            
+            let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+            blogs.push({ title, content, likes: 0 });
+            localStorage.setItem("blogs", JSON.stringify(blogs));
+            
+            document.getElementById("blogTitle").value = "";
+            document.getElementById("blogContent").value = "";
+            loadBlogs();
+        }
+
+        function loadBlogs() {
+            let blogList = document.getElementById("blogList");
+            blogList.innerHTML = "";
+            let blogs = JSON.parse(localStorage.getItem("blogs")) || [];
+            
+            blogs.forEach((blog, index) => {
+                let blogCard = document.createElement("div");
+                blogCard.className = "card blog-card p-3 bg-info";
+                blogCard.innerHTML = `
+                    <h5>${blog.title}</h5>
+                    <p>${blog.content}</p>
+                    <div>
+                        <button class="btn btn-success w-6" onclick="likeBlog(${index})">Like (<span id="likeCount${index}">${blog.likes}</span>)</button>
+                    </div>
+                `;
+                blogList.appendChild(blogCard);
+            });
+        }
+
+        function likeBlog(index) {
+            let blogs = JSON.parse(localStorage.getItem("blogs"));
+            blogs[index].likes++;
+            localStorage.setItem("blogs", JSON.stringify(blogs));
+            document.getElementById(`likeCount${index}`).innerText = blogs[index].likes;
+        }
+    </script>
+</body>
+</html>
